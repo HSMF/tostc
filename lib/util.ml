@@ -65,3 +65,12 @@ module Option = struct
     | None -> raise exn
     | Some x -> x
 end
+
+module Seq = struct
+  include Seq
+
+  let inspect f =
+    Seq.map (fun x ->
+      f x;
+      x)
+end
