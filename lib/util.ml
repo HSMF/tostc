@@ -54,7 +54,8 @@ module Option = struct
 
   let unwrap_or default = fold ~none:default ~some:id
 
-  (** fish operator *)
+  (** fish operator: Provides fallback for option
+      [Some x ><> f = Some x]. [None ><> f = f ()] *)
   let ( ><> ) opt or_else =
     match opt with
     | Some x -> Some x
@@ -73,4 +74,17 @@ module Seq = struct
     Seq.map (fun x ->
       f x;
       x)
+end
+
+module String = struct
+  include String
+
+  (** [String.pop_prefix ~prefix s] returns [Some remainder] if [s = prefix ^ remainder] and None otherwise *)
+  let pop_prefix ~prefix s =
+    if String.starts_with ~prefix s
+    then (
+      let len = String.length s in
+      let prefix_len = String.length prefix in
+      Some (String.sub s prefix_len (len - prefix_len)))
+    else None
 end

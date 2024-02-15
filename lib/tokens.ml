@@ -18,6 +18,14 @@ type token =
   | Times
   | Divide
   | Comma
+  | Assign
+  | Equals
+  | NotEquals
+  | Dot
+  | String of string
+  | StringFragment of string
+  | BeginString
+  | EndString
   | Ident of string
   | Int of int64
 
@@ -28,6 +36,10 @@ let string_of_token = function
   | CloseParen -> "CloseParen"
   | Ident x -> sp "Ident (%s)" x
   | Int x -> sp "Int (%Ld)" x
+  | String s -> sp "String (\"%s\")" (String.escaped s)
+  | StringFragment s -> sp "StringFragment (\"%s\")" (String.escaped s)
+  | BeginString -> "BeginString"
+  | EndString -> "EndString"
   | Toaster -> "Toaster"
   | Happy -> "Happy"
   | Sad -> "Sad"
@@ -41,3 +53,7 @@ let string_of_token = function
   | Times -> "Times"
   | Divide -> "Divide"
   | Comma -> "Comma"
+  | Assign -> "Assign"
+  | Equals -> "Equals"
+  | NotEquals -> "NotEquals"
+  | Dot -> "Dot"
