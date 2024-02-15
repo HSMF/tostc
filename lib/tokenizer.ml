@@ -15,6 +15,7 @@ let reserved =
   ; "{", OpenBrace
   ; "}", CloseBrace
   ; "toaster", Toaster
+  ; "return", Return
   ; ":>", Happy
   ; ":<", Sad
   ; ":", Colon
@@ -41,6 +42,16 @@ let create_token lexbuf =
 let create_int lexbuf =
   let str = Utf8.lexeme lexbuf in
   Int (Int64.of_string str)
+
+
+let escape_sequence lexbuf =
+  let str = Utf8.lexeme lexbuf in
+  match str with
+  | "\\r" -> "\r"
+  | "\\n" -> "\n"
+  | "\\t" -> "\t"
+  | "\\\"" -> "\""
+  | _ -> failwith "unrecognized escape sequence. this is a bug. please report this"
 
 
 (* TODO: implement tokenizer *)
@@ -97,6 +108,9 @@ let lex buf : token Seq.t =
       new_line buf;
       Buffer.add_string b (Utf8.lexeme buf);
       string b buf
+    | '\\', Chars "nrt\"" ->
+      Buffer.add_string b (escape_sequence buf);
+      string b buf
     | any ->
       Buffer.add_string b (Utf8.lexeme buf);
       string b buf
@@ -107,7 +121,7 @@ let lex buf : token Seq.t =
     | '"' ->
       (* produce a fragment of the remainder of the string and a EndString token *)
       decr in_fmt;
-      prod  (StringFragment (Buffer.contents b)) ~after:(const @@ prod EndString)
+      prod (StringFragment (Buffer.contents b)) ~after:(const @@ prod EndString)
     | "{{" ->
       Buffer.add_char b '{';
       format_string b buf

@@ -22,6 +22,7 @@ type token =
   | Equals
   | NotEquals
   | Dot
+  | Return
   | String of string
   | StringFragment of string
   | BeginString
@@ -57,3 +58,4 @@ let string_of_token = function
   | Equals -> "Equals"
   | NotEquals -> "NotEquals"
   | Dot -> "Dot"
+  | Return -> "Return"
