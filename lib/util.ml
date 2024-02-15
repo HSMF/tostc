@@ -87,4 +87,15 @@ module String = struct
       let prefix_len = String.length prefix in
       Some (String.sub s prefix_len (len - prefix_len)))
     else None
+
+
+  (** [String.pop_suffix ~suffix s] returns [Some remainder]
+      if [s = remainder ^ suffix] and None otherwise *)
+  let pop_suffix ~suffix s =
+    if String.ends_with ~suffix s
+    then (
+      let len = String.length s in
+      let suffix_len = String.length suffix in
+      Some (String.sub s 0 (len - suffix_len)))
+    else None
 end

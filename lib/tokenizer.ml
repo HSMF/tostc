@@ -8,6 +8,9 @@ let number = [%sedlex.regexp? Plus digit]
 let newline = [%sedlex.regexp? '\n' | '\r', '\n' | '\r']
 let ident_char = [%sedlex.regexp? alphabetic | '_']
 let spaces = [%sedlex.regexp? Sub (white_space, Chars "\n\r")]
+let hex = [%sedlex.regexp? '0' .. '9' | 'a' .. 'f']
+let unicode_escape = [%sedlex.regexp? "\\u", '{', Rep (ascii_hex_digit, 1 .. 5), '}']
+
 
 let reserved =
   [ "(", OpenParen
@@ -44,6 +47,16 @@ let create_int lexbuf =
   Int (Int64.of_string str)
 
 
+let parse_hex s =
+  let int_of_ch = function
+    | '0' .. '9' as c -> int_of_char c - int_of_char '0'
+    | 'a' .. 'f' as c -> int_of_char c - int_of_char 'a' + 10
+    | 'A' .. 'F' as c -> int_of_char c - int_of_char 'A' + 10
+    | _ -> failwith "should not be reachable"
+  in
+  Seq.fold_left (fun acc ch -> int_of_ch ch + (16 * acc)) 0 s
+
+
 let escape_sequence lexbuf =
   let str = Utf8.lexeme lexbuf in
   match str with
@@ -51,7 +64,19 @@ let escape_sequence lexbuf =
   | "\\n" -> "\n"
   | "\\t" -> "\t"
   | "\\\"" -> "\""
-  | _ -> failwith "unrecognized escape sequence. this is a bug. please report this"
+  | _ ->
+    begin
+      str
+      |> String.pop_prefix ~prefix:"\\u{"
+      >>= String.pop_suffix ~suffix:"}"
+      $> fun hex ->
+      let ch = hex |> String.to_seq |> parse_hex |> Uchar.of_int in
+      let b = Buffer.create 4 in
+      Buffer.add_utf_8_uchar b ch;
+      Buffer.contents b
+    end
+    |> Option.unwrap
+         ~exn:(Failure "unrecognized escape sequence. this is a bug. please report this")
 
 
 (* TODO: implement tokenizer *)
@@ -108,6 +133,10 @@ let lex buf : token Seq.t =
       new_line buf;
       Buffer.add_string b (Utf8.lexeme buf);
       string b buf
+    | unicode_escape ->
+
+      Buffer.add_string b (escape_sequence buf);
+      string b buf
     | '\\', Chars "nrt\"" ->
       Buffer.add_string b (escape_sequence buf);
       string b buf
@@ -131,6 +160,12 @@ let lex buf : token Seq.t =
       Buffer.add_string b (Utf8.lexeme buf);
       format_string b buf
     | '}' -> failwith "unopened closing brace (})"
+    | unicode_escape ->
+      Buffer.add_string b (escape_sequence buf);
+      string b buf
+    | '\\', Chars "nrt\"" ->
+      Buffer.add_string b (escape_sequence buf);
+      string b buf
     | any ->
       Buffer.add_string b (Utf8.lexeme buf);
       format_string b buf
