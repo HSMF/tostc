@@ -1,0 +1,89 @@
+\documentclass[10pt]{article}
+\usepackage[a4paper,
+            bindingoffset=0.2in,
+            left=1in,
+            right=1in,
+            top=1in,
+            bottom=1in,
+            footskip=.25in]{geometry}
+
+\usepackage{syntax}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+
+\newcommand{\eempty}{$\varepsilon$}
+
+\begin{document}
+
+\section*{Lexical Rules}
+
+\begin{enumerate}
+    \item Identifiers may be any Unicode alphanumeric character or `\verb|_|' optionally followed by more alphanumeric characters, `\verb|_|', or digits
+    \item Line-comments start with `\verb|//|' and go to the end of the line
+    \item Block-comments start with `\verb|/*|' and go until a matching `\verb|*/|'. They may nest.
+    \item Strings are surrounded by `\verb|"|'. They may contain the following escape sequences \begin{enumerate}
+              \item `\verb|\n|' : character newline (ASCII code point 10)
+              \item `\verb|\r|' : carriage return (ASCII code point 13)
+              \item `\verb|\t|' : horizontal tab (ASCII code point 9)
+              \item `\verb|\"|' : literal " (ASCII code point 34)
+              \item TODO: add Unicode escape sequences
+          \end{enumerate}
+
+    \item Format strings are start with by `\verb|f"|' and end with `\verb|"|'. They may contain the same escape sequences as normal strings. Additionally, they may contain expressions that are surrounded by `\verb|{|' and `\verb|}|'. Due to current restrictions, these expressions cannot contain `\verb|{|' or `\verb|}|'.
+
+\end{enumerate}
+
+\section*{Grammar}
+\setlength{\grammarparsep}{20pt plus 1pt minus 1pt}
+\setlength{\grammarindent}{12em}
+
+In the following grammar specification, $\langle \text{UPPERCASE} \rangle$
+denotes non-terminal rules, whereas $\langle \text{lowercase} \rangle$ denotes a token. `\verb|literal|' denotes a simple token
+
+Every comma separated list may be empty. Trailing commas are not yet supported.
+
+\begin{grammar}
+
+
+    <PROGRAM> ::= ( <ITEM> )*
+
+    <ITEM> ::= <FUNCTION>
+
+    <FUNCTION> ::= `toaster' <ident> <HAPPINESS> \\
+    <ARG_LIST> <RETURN_TYPE> \\
+    <BLOCK>
+
+    <HAPPINESS> ::= `:>' \alt `:<'
+
+
+    <ARG_LIST> ::= <ident>$_1$ `:' <TYPE>$_1$ `,' \dots `,' <ident>$_n$ `:' <TYPE>$_n$
+
+    <RETURN_TYPE> ::= `->' <TYPE>
+    \alt \eempty
+
+    <TYPE> ::= <ident>
+    \alt `(' <TYPE> `)'
+    \alt `(' <TYPE>$_1$ `,' \dots `,' <TYPE>$_n$ `)'
+
+
+    <BLOCK> ::= `{' (<STATEMENT>)* <EXPR>? `}'
+
+    <STATEMENT> ::= `return' `;'
+    \alt `return' <EXPR> `;'
+    \alt `let' <PATTERN> `=' <EXPR> `;'
+    \alt <IF_EXPR>
+    \alt <RHS> `=' <EXPR> `;'
+
+    <EXPR> ::= <integer>
+    \alt <string>
+    \alt <EXPR> <BINOP> <EXPR>
+    \alt <UNOP> <EXPR>
+    \alt <FUNC_CALL>
+    \alt `(' <EXPR> `)'
+    \alt <IF_EXPR>
+
+    <IF_EXPR> ::= `if' <EXPR> <BLOCK> \\ ( `else' `if' <EXPR> <BLOCK> )* \\( `else' <BLOCK> )?
+
+\end{grammar}
+
+\end{document}
