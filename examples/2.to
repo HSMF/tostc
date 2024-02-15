@@ -1,0 +1,20 @@
+// toast for structs?
+// with or without '='?
+toast person = {
+  age: int,
+  name: string,
+}
+
+// associated functions
+// self and this are outdated keywords
+person toaster to_string :> me {
+  return f"{me.name} is {me.age}";
+}
+
+toaster main :> {
+  let dude = person {
+    age: 1,
+    name: "aristoteles"
+  };
+  print(dude.to_string()) 
+}

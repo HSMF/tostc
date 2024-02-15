@@ -1,0 +1,13 @@
+TARGET = ocaml
+PRELUDE = {
+  open Tokens
+}
+ENTRY = grammar
+
+token_Ident = string
+
+grammar: { string }
+  | Ident { v0 }
+  | OpenParen grammar CloseParen { v1 }
+
+# TODO: implement grammar

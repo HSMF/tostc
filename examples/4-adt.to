@@ -1,0 +1,13 @@
+toast Option<T> = slice {
+    None,
+    Some(T)
+}
+
+toaster foo(o: Option<int>) {
+    select o {
+        None => print("no int here"),
+        Some(x) => print("hey: " + str(x))
+    }
+}
+
+

@@ -1,0 +1,14 @@
+(library
+ (name Lib)
+ (libraries sedlex)
+ (preprocess (pps sedlex.ppx))
+)
+
+(rule
+ (alias generate)
+ (deps grammar.ast)
+ (targets grammar.ml)
+ (action
+  (run asterisk grammar.ast -o grammar.ml)))
+
+(include_subdirs qualified)

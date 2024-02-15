@@ -1,0 +1,9 @@
+// happy function
+toaster incr :> x: int -> int {
+  return x + 1;
+}
+
+// sad function :(
+toaster add :< x: int, y: int -> int {
+  return x + y;
+}

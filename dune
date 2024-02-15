@@ -1,0 +1,10 @@
+(executable
+ (name main)
+ (public_name tostc)
+ (libraries Lib)
+ (modes byte))
+
+(env
+ (dev
+  (flags
+   (:standard -warn-error -A -no-strict-formats))))

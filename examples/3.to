@@ -1,0 +1,16 @@
+condiment std.Map;
+
+bag myPackage {
+    toaster foo :> m: Map {
+        println("called myPackage.foo");
+        println(m.get("key"))
+    }
+}
+
+toaster main :> {
+    let m = Map.from([
+        ("key", "value")
+    ]);
+    myPackage.foo();
+}
+

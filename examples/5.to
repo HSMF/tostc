@@ -1,0 +1,39 @@
+/// the add recipe tells the compiler what to do when lhs + rhs is encountered
+recipe Add {
+    toast Output;
+    toaster add :> me, other: Me -> Output;
+}
+
+bake int with Add {
+    toast Output = Me; // Me is a synonym for int
+
+    toaster add :> me, other: Me -> Output {
+        __intrinsic_int_add(me, other);
+    }
+}
+
+// high sophistication here
+bake float à la Add {
+    toast Output = Me;
+
+    toaster add :> me, other: Me -> Output {
+        __intrinsic_float_add(me, other);
+    }
+}
+
+bake String with Add {
+    toast Output = Me; // Me is a synonym for String
+    toaster add :> me, other: Me -> Output {
+        String.concat(me, other)
+    }
+}
+
+
+recipe Show {
+    toaster show :> me;
+}
+
+toast Foo = {
+    a: int,
+    b: int
+}
