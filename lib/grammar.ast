@@ -23,21 +23,16 @@ HAPPINESS: { bool }
   | Happy { true }
   | Sad { false }
 
-ARG_LIST: { arg list }
-  | ARG_LIST_ { v0 }
-  # | ARG_LIST_ Comma { v0 }
-  # TODO(asterisk): figure out how to resolve this shift/reduce conflict
-  # maybe just give option to always reduce MORE_ARGS if possible?
+ARG: { arg }
+  | Ident Colon TYPE { v0, v2 }
 
-ARG_LIST_: { arg list }
-  | { [] }
-  | Ident Colon TYPE { [v0, v2] }
-  | Ident Colon TYPE MORE_ARGS { (v0, v2)::v3 }
+ARG_LIST: {arg list}
+  | ARG_LIST_ { List.rev v0 }
+  | ARG_LIST_ Comma { List.rev v0 }
 
-MORE_ARGS: { arg list }
-  | Comma Ident Colon TYPE { [] }
-  | Comma Ident Colon TYPE MORE_ARGS { (v1, v3)::v4 }
-  # v0    v1    v2    v3   v4
+ARG_LIST_: {arg list}
+  | ARG_LIST_ Comma ARG { v2 :: v0 }
+  | ARG { [v0] }
 
 TYPE: { ty }
   | OpenParen CloseParen { TTuple [] }

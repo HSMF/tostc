@@ -1,8 +1,8 @@
-\documentclass[10pt]{article}
+\documentclass[10pt]{artikel1}
 \usepackage[a4paper,
-            bindingoffset=0.2in,
-            left=1in,
-            right=1in,
+            bindingoffset=0in,
+            left=1.5in,
+            right=1.5in,
             top=1in,
             bottom=1in,
             footskip=.25in]{geometry}
@@ -11,9 +11,13 @@
 \usepackage{amsfonts}
 \usepackage{amsmath}
 
+\title{Specification for Tost}
+\author{}
+
 \newcommand{\eempty}{$\varepsilon$}
 
 \begin{document}
+\maketitle
 
 \section*{Lexical Rules}
 
@@ -26,7 +30,7 @@
               \item `\verb|\r|' : carriage return (ASCII code point 13)
               \item `\verb|\t|' : horizontal tab (ASCII code point 9)
               \item `\verb|\"|' : literal " (ASCII code point 34)
-              \item TODO: add Unicode escape sequences
+              \item `\verb|\u{|' codepoint `\verb|}|' : the Unicode character with the given code point, in hexadecimal
           \end{enumerate}
 
     \item Format strings are start with by `\verb|f"|' and end with `\verb|"|'. They may contain the same escape sequences as normal strings. Additionally, they may contain expressions that are surrounded by `\verb|{|' and `\verb|}|'. Due to current restrictions, these expressions cannot contain `\verb|{|' or `\verb|}|'.
@@ -40,7 +44,7 @@
 In the following grammar specification, $\langle \text{UPPERCASE} \rangle$
 denotes non-terminal rules, whereas $\langle \text{lowercase} \rangle$ denotes a token. `\verb|literal|' denotes a simple token
 
-Every comma separated list may be empty. Trailing commas are not yet supported.
+Every comma separated list may be empty. Trailing commas are supported.
 
 \begin{grammar}
 
@@ -80,9 +84,12 @@ Every comma separated list may be empty. Trailing commas are not yet supported.
     \alt <UNOP> <EXPR>
     \alt <FUNC_CALL>
     \alt `(' <EXPR> `)'
+    \alt `(' <EXPR>$_1$, \dots, <EXPR>$_n$ `)'
     \alt <IF_EXPR>
 
     <IF_EXPR> ::= `if' <EXPR> <BLOCK> \\ ( `else' `if' <EXPR> <BLOCK> )* \\( `else' <BLOCK> )?
+
+    <PATTERN> ::= <ident>
 
 \end{grammar}
 
