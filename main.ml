@@ -1,5 +1,5 @@
 open Lib
-open Printf
+open! Printf
 
 
 
