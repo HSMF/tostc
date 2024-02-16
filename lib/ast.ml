@@ -36,6 +36,7 @@ and expr =
   | EVar of id
   | ETuple of expr node list
   | EBop of bop * expr node * expr node
+  | EUop of uop * expr node
   | EInt of int64
 
 and bop =
@@ -43,3 +44,24 @@ and bop =
   | BopSub
   | BopMul
   | BopDiv
+  | BopExp
+  | BopShr
+  | BopShl
+  | BopLogAnd
+  | BopLogOr
+  | BopLogXor
+  | BopBitAnd
+  | BopBitOr
+  | BopBitXor
+  | BopLess
+  | BopLessEqual
+  | BopGreater
+  | BopGreaterEqual
+  | BopEqual
+  | BopNotEqual
+
+and uop =
+  | UopPos
+  | UopNegative
+  | UopNeg
+  | UopFlip

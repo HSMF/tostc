@@ -3,6 +3,9 @@ PRELUDE = {
   open! Tokens
   open! Ast
   open! Span
+
+  let bop b l r = no_loc @@ EBop (b, l, r)
+  let uop b l = no_loc @@ EUop (b, l)
 }
 ENTRY = program
 
@@ -54,6 +57,71 @@ STATEMENT: { stmt node }
   | Return EXPR Semicolon { no_loc @@ SReturn v1 }
 
 EXPR: { expr node }
+  | EXPR LogOr EXPR_LXOR { bop BopLogOr v0 v2 }
+  | EXPR_LXOR { v0 }
+
+EXPR_LXOR: { expr node }
+  | EXPR_LXOR LogXor EXPR_LAND { bop BopLogXor v0 v2 }
+  | EXPR_LAND { v0 }
+
+EXPR_LAND: { expr node }
+  | EXPR_LAND LogAnd EXPR_EQ { bop BopLogAnd v0 v2 }
+  | EXPR_EQ { v0 }
+
+EXPR_EQ: { expr node }
+  | EXPR_EQ Equals EXPR_ORD { bop BopEqual v0 v2 }
+  | EXPR_EQ NotEquals EXPR_ORD { bop BopNotEqual v0 v2 }
+  | EXPR_ORD { v0 }
+
+EXPR_ORD: { expr node }
+  | EXPR_ORD Less EXPR_BOR { bop BopLess v0 v2 }
+  | EXPR_ORD LessEqual EXPR_BOR { bop BopLessEqual v0 v2 }
+  | EXPR_ORD GreaterEqual EXPR_BOR { bop BopGreaterEqual v0 v2 }
+  | EXPR_ORD Greater EXPR_BOR { bop BopGreater v0 v2 }
+  | EXPR_BOR { v0 }
+
+EXPR_BOR: { expr node }
+  | EXPR_BOR BitOr EXPR_BXOR { bop BopBitOr v0 v2 }
+  | EXPR_BXOR { v0 }
+
+EXPR_BXOR: { expr node }
+  | EXPR_BXOR BitXor EXPR_BAND { bop BopBitXor v0 v2 }
+  | EXPR_BAND { v0 }
+
+EXPR_BAND: { expr node }
+  | EXPR_BAND BitAnd EXPR_SHIFT { bop BopBitAnd v0 v2 }
+  | EXPR_SHIFT { v0 }
+
+EXPR_SHIFT: { expr node }
+  | EXPR_SHIFT ShiftRight EXPR_ADD { bop BopShr v0 v2 }
+  | EXPR_SHIFT ShiftLeft EXPR_ADD { bop BopShl v0 v2 }
+  | EXPR_ADD { v0 }
+
+EXPR_ADD: { expr node }
+  | EXPR_ADD Plus EXPR_MUL { bop BopAdd v0 v2 }
+  | EXPR_ADD Minus EXPR_MUL { bop BopSub v0 v2 }
+  | EXPR_MUL { v0 }
+
+EXPR_MUL: { expr node }
+  | EXPR_MUL Times EXPR_UOP { bop BopMul v0 v2 }
+  | EXPR_MUL Divide EXPR_UOP { bop BopDiv v0 v2 }
+  | EXPR_UOP { v0 }
+
+EXPR_UOP: { expr node}
+  | Minus EXPR_UOP { uop UopNegative v1 }
+  | Plus EXPR_UOP { uop UopPos v1 }
+  | BinNot EXPR_UOP { uop UopFlip v1 }
+  | LogNot EXPR_UOP { uop UopNeg v1 }
+  | EXPR_EXP { v0 }
+
+EXPR_EXP: { expr node }
+  | EXPR_EXP Exponent EXPR_ATOM { bop BopExp v0 v2 }
+  | EXPR_ATOM { v0 }
+
+EXPR_ATOM: { expr node }
+  | OpenParen EXPR CloseParen { v1 }
+  | OpenParen CloseParen { no_loc @@ ETuple [] }
   | Int { no_loc @@ EInt v0 }
+  | Ident { no_loc @@ EVar v0 }
 
 # TODO: implement grammar

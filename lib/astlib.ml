@@ -64,6 +64,7 @@ and string_of_expr ?(indentation = 0) (e : expr) =
   | ETuple els -> sp "(%s)" @@ sl se ", " els
   | EBop (op, l, r) -> sp "(%s %s %s)" (se l) (string_of_bop op) (se r)
   | EInt i -> Int64.to_string i
+  | EUop (op, e) -> sp "(%s %s)" (string_of_uop op) (se e)
 
 
 and string_of_bop (b : bop) =
@@ -72,3 +73,25 @@ and string_of_bop (b : bop) =
   | BopSub -> "-"
   | BopMul -> "*"
   | BopDiv -> "/"
+  | BopExp -> "**"
+  | BopShr -> ">>"
+  | BopShl -> "<<"
+  | BopLogAnd -> "&&"
+  | BopLogOr -> "||"
+  | BopLogXor -> "^^"
+  | BopBitAnd -> "&"
+  | BopBitOr -> "|"
+  | BopBitXor -> "^"
+  | BopLess -> "<"
+  | BopLessEqual -> "<="
+  | BopGreater -> ">"
+  | BopGreaterEqual -> ">="
+  | BopEqual -> "=="
+  | BopNotEqual -> "!="
+
+
+and string_of_uop = function
+  | UopNeg -> "!"
+  | UopNegative -> "-"
+  | UopPos -> "+"
+  | UopFlip -> "~"
