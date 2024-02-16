@@ -13,15 +13,32 @@ type token =
   | Colon
   | Arrow
   | Semicolon
+  (* unary operators *)
+  | LogNot
+  | BinNot
   | Plus
   | Minus
+  (* binary operators *)
   | Times
   | Divide
-  | Comma
-  | Assign
+  | Exponent
+  | ShiftRight
+  | ShiftLeft
+  | LogAnd
+  | LogOr
+  | LogXor
+  | BitAnd
+  | BitOr
+  | BitXor
+  | Less
+  | LessEqual
+  | GreaterEqual
+  | Greater
   | Equals
   | NotEquals
+  | Assign
   | Dot
+  | Comma
   | Return
   | String of string
   | StringFragment of string
@@ -59,3 +76,18 @@ let string_of_token = function
   | NotEquals -> "NotEquals"
   | Dot -> "Dot"
   | Return -> "Return"
+  | LogNot -> "LogNot"
+  | BinNot -> "BinNot"
+  | Exponent -> "Exponent"
+  | ShiftRight -> "ShiftRight"
+  | ShiftLeft -> "ShiftLeft"
+  | LogAnd -> "LogAnd"
+  | LogOr -> "LogOr"
+  | LogXor -> "LogXor"
+  | BitAnd -> "BitAnd"
+  | BitOr -> "BitOr"
+  | BitXor -> "BitXor"
+  | Less -> "Less"
+  | LessEqual -> "LessEqual"
+  | GreaterEqual -> "GreaterEqual"
+  | Greater -> "Greater"

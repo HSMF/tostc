@@ -4,13 +4,14 @@ open Sedlexing
 open! Printf
 
 let digit = [%sedlex.regexp? '0' .. '9']
-let number = [%sedlex.regexp? Plus digit]
+let decimal_number = [%sedlex.regexp? Plus (digit | '_')]
+let hex_number = [%sedlex.regexp? "0x", Plus (ascii_hex_digit | '_')]
+let bin_number = [%sedlex.regexp? "0b", Plus ('0' | '1' | '_')]
+let number = [%sedlex.regexp? decimal_number | hex_number | bin_number]
 let newline = [%sedlex.regexp? '\n' | '\r', '\n' | '\r']
 let ident_char = [%sedlex.regexp? alphabetic | '_']
 let spaces = [%sedlex.regexp? Sub (white_space, Chars "\n\r")]
-let hex = [%sedlex.regexp? '0' .. '9' | 'a' .. 'f']
 let unicode_escape = [%sedlex.regexp? "\\u", '{', Rep (ascii_hex_digit, 1 .. 5), '}']
-
 
 let reserved =
   [ "(", OpenParen
@@ -19,19 +20,37 @@ let reserved =
   ; "}", CloseBrace
   ; "toaster", Toaster
   ; "return", Return
+  ; (* unary operators *)
+    "+", Plus
+  ; "-", Minus
+  ; "!", LogNot
+  ; "~", BinNot
+  ; (* binary operators *)
+    "*", Times
+  ; "/", Divide
+  ; "**", Exponent
+  ; ">>", ShiftRight
+  ; "<<", ShiftLeft
+  ; "&&", LogAnd
+  ; "||", LogOr
+  ; "^^", LogXor
+  ; "&", BitAnd
+  ; "|", BitOr
+  ; "^", BitXor
+  ; "<", Less
+  ; "<=", LessEqual
+  ; ">=", GreaterEqual
+  ; ">", Greater
+  ; "==", Equals
+  ; "!=", NotEquals
+  ; (* *)
+    "=", Assign
+  ; ",", Comma
   ; ":>", Happy
   ; ":<", Sad
   ; ":", Colon
   ; "->", Arrow
   ; ";", Semicolon
-  ; "+", Plus
-  ; "-", Minus
-  ; "*", Times
-  ; "/", Divide
-  ; ",", Comma
-  ; "==", Equals
-  ; "=", Assign
-  ; "!=", NotEquals
   ]
   |> List.to_seq
   |> Hashtbl.of_seq
@@ -101,9 +120,22 @@ let lex buf : token Seq.t =
       if !in_fmt = 0
       then produce @@ create_token buf
       else format_string (Buffer.create 16) buf
-    | ":>" | ":<" | "->" | "!=" | "==" | Chars "(){+-*/;:,=" ->
-      produce @@ create_token buf
-    | Opt (Chars "+-"), number -> produce @@ create_int buf
+    | ":>"
+    | ":<"
+    | "->"
+    | "!="
+    | "=="
+    | "<="
+    | ">="
+    | "<<"
+    | ">>"
+    | "**"
+    | "&&"
+    | "||"
+    | "^^"
+    | Chars "()={,;:"
+    | Chars "+-*/&|^<>~!" -> produce @@ create_token buf
+    | number -> produce @@ create_int buf
     | ident_char, Star (ident_char | digit) -> produce @@ create_token buf
     | eof -> Seq.Nil
     | any -> failwith @@ sp "Unexpected character %s" (Utf8.lexeme buf)
@@ -134,7 +166,6 @@ let lex buf : token Seq.t =
       Buffer.add_string b (Utf8.lexeme buf);
       string b buf
     | unicode_escape ->
-
       Buffer.add_string b (escape_sequence buf);
       string b buf
     | '\\', Chars "nrt\"" ->
