@@ -51,6 +51,9 @@ STATEMENTS: { stmt node list }
 
 STATEMENT: { stmt node }
   | Return Semicolon { no_loc @@ SReturn (no_loc @@ ETuple []) }
+  | Return EXPR Semicolon { no_loc @@ SReturn v1 }
 
+EXPR: { expr node }
+  | Int { no_loc @@ EInt v0 }
 
 # TODO: implement grammar

@@ -63,6 +63,7 @@ and string_of_expr ?(indentation = 0) (e : expr) =
   | EVar v -> v
   | ETuple els -> sp "(%s)" @@ sl se ", " els
   | EBop (op, l, r) -> sp "(%s %s %s)" (se l) (string_of_bop op) (se r)
+  | EInt i -> Int64.to_string i
 
 
 and string_of_bop (b : bop) =

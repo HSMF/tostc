@@ -36,6 +36,7 @@ and expr =
   | EVar of id
   | ETuple of expr node list
   | EBop of bop * expr node * expr node
+  | EInt of int64
 
 and bop =
   | BopAdd
