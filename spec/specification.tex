@@ -14,6 +14,8 @@
 \title{Specification for Tost}
 \author{}
 
+\newcommand{\token}[1]{`\texttt{#1}'}
+
 \newcommand{\eempty}{$\varepsilon$}
 
 \begin{document}
@@ -91,6 +93,47 @@ Every comma separated list may be empty. Trailing commas are supported.
 
     <PATTERN> ::= <ident>
 
+    <BINOP> ::= `+'
+    \alt `-'
+    \alt `*'
+    \alt `/'
+    \alt `**'
+    \alt `>>'
+    \alt `<<'
+    \alt `&&'
+    \alt `||'
+    \alt `^^'
+    \alt `&'
+    \alt `|'
+    \alt `^'
+    \alt `<'
+    \alt `<='
+    \alt `>='
+    \alt `>'
+    \alt `=='
+    \alt `!='
+
+    <UNOP> ::= `-'
+    \alt `+'
+    \alt `!'
+    \alt `~'
+
 \end{grammar}
+
+The precedence for binary operations are as follows, earlier in the list is stronger precedence \begin{enumerate}
+    \item \token{**} : exponentiation
+    \item \token{-}, \token{+}, \token{!}, \token{~}: unary minus, unary plus, logical and bitwise negation
+    \item \token{*}, \token{/} : multiplication and division
+    \item \token{-}, \token{+} : binary minus and plus
+    \item \token{<<}, \token{>>} : shift left, shift right
+    \item \token{<}, \token{<=}, \token{>=}, \token{>} : less, less or equal, greater or equal, greater
+    \item \token{==}, \token{!=} : equal, not equal
+    \item `\verb|&&|' : logical and
+    \item `\verb|^^|' : logical xor
+    \item \token{||} : logical or
+    \item `\verb|&|' : binary and
+    \item `\verb|^|' : binary xor
+    \item \token{|} : binary or
+\end{enumerate}
 
 \end{document}
