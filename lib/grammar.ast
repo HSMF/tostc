@@ -32,6 +32,8 @@ ARG: { arg }
 ARG_LIST: {arg list}
   | ARG_LIST_ { List.rev v0 }
   | ARG_LIST_ Comma { List.rev v0 }
+  | Comma { [] }
+  | { [] }
 
 ARG_LIST_: {arg list}
   | ARG_LIST_ Comma ARG { v2 :: v0 }
