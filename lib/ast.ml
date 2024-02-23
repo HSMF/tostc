@@ -28,7 +28,10 @@ and block = stmt node list
 
 and stmt =
   | SReturn of expr node
+  | SGive of expr node
   | SDecl of pattern node * expr node
+  | SIf of expr node * block * block option
+  | SLet of pattern * expr node
 
 and pattern = PId of id
 
@@ -38,6 +41,11 @@ and expr =
   | EBop of bop * expr node * expr node
   | EUop of uop * expr node
   | EInt of int64
+  | EIf of expr node * block * block option
+  | EString of string
+  | EFormatString of segment list
+
+and segment = Fragment of string | SegExpr of expr node
 
 and bop =
   | BopAdd

@@ -57,6 +57,10 @@ STATEMENTS: { stmt node list }
 STATEMENT: { stmt node }
   | Return Semicolon { no_loc @@ SReturn (no_loc @@ ETuple []) }
   | Return EXPR Semicolon { no_loc @@ SReturn v1 }
+  | Give Semicolon { no_loc @@ SGive (no_loc @@ ETuple []) }
+  | Give EXPR Semicolon { no_loc @@ SGive v1 }
+  | IF_CONSTRUCT { match v0 with (cond, yes, no) -> no_loc @@ SIf (cond, yes, no) }
+  | Let PATTERN Assign EXPR Semicolon { no_loc @@ SLet (v1, v3) }
 
 EXPR: { expr node }
   | EXPR LogOr EXPR_LXOR { bop BopLogOr v0 v2 }
@@ -125,5 +129,20 @@ EXPR_ATOM: { expr node }
   | OpenParen CloseParen { no_loc @@ ETuple [] }
   | Int { no_loc @@ EInt v0 }
   | Ident { no_loc @@ EVar v0 }
+  | IF_CONSTRUCT { match v0 with (cond, yes, no) -> no_loc @@ EIf (cond, yes, no) }
+  | String { no_loc @@ EString v0 }
+  | BeginString FORMAT EndString { no_loc @@ EFormatString v1 }
+
+FORMAT: { segment list }
+  | StringFragment { [Fragment v0] }
+  | StringFragment EXPR FORMAT { (Fragment v0) :: (SegExpr v1) :: v2  }
+
+IF_CONSTRUCT: { expr node * block * block option }
+  | If EXPR BLOCK { (v1, v2, None) }
+  | If EXPR BLOCK Else BLOCK { (v1, v2, Some v4) }
+# TODO else if chains etc
+
+PATTERN: { pattern }
+  | Ident { PId v0 }
 
 # TODO: implement grammar

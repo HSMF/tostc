@@ -45,8 +45,16 @@ and string_of_stmt ?(indentation = 0) (s : stmt) =
     match s with
     | SReturn { elt = ETuple []; _ } -> "return;"
     | SReturn exp -> sp "return %s;" (string_of_expr ~indentation exp.elt)
+    | SGive { elt = ETuple []; _ } -> "give;"
+    | SGive exp -> sp "give %s;" (string_of_expr ~indentation exp.elt)
     | SDecl (pat, exp) ->
       sp "let %s = %s;" (string_of_pattern pat.elt) (string_of_expr exp.elt)
+    | SIf (cond, yes, no) -> string_of_expr ~indentation (EIf (cond, yes, no))
+    | SLet (pat, e) ->
+      sp
+        "let %s = %s;"
+        (string_of_pattern ~indentation pat)
+        (string_of_expr ~indentation e.elt)
   end
   |> indented indentation
 
@@ -65,6 +73,23 @@ and string_of_expr ?(indentation = 0) (e : expr) =
   | EBop (op, l, r) -> sp "(%s %s %s)" (se l) (string_of_bop op) (se r)
   | EInt i -> Int64.to_string i
   | EUop (op, e) -> sp "(%s %s)" (string_of_uop op) (se e)
+  | EIf (cond, thn, None) -> sp "if %s %s" (se cond) (string_of_block ~indentation thn)
+  | EIf (cond, thn, Some els) ->
+    sp
+      "if %s %s else %s"
+      (se cond)
+      (string_of_block ~indentation thn)
+      (string_of_block ~indentation els)
+  | EString s -> sp "\"%s\"" (String.escaped s) (* use own escaping function here maybe*)
+  | EFormatString parts ->
+    sp
+      "f\"%s\""
+      (sl
+         (function
+           | Fragment x -> x
+           | SegExpr ex -> sp "{%s}" @@ se ex)
+         ""
+         parts)
 
 
 and string_of_bop (b : bop) =

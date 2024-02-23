@@ -20,6 +20,10 @@ let reserved =
   ; "}", CloseBrace
   ; "toaster", Toaster
   ; "return", Return
+  ; "give", Give
+  ; "let", Let
+  ; "if", If
+  ; "else", Else
   ; (* unary operators *)
     "+", Plus
   ; "-", Minus

@@ -10,6 +10,9 @@ type token =
   | Toaster
   | Happy
   | Sad
+  | If
+  | Else
+  | Let
   | Colon
   | Arrow
   | Semicolon
@@ -40,6 +43,7 @@ type token =
   | Dot
   | Comma
   | Return
+  | Give
   | String of string
   | StringFragment of string
   | BeginString
@@ -61,6 +65,9 @@ let string_of_token = function
   | Toaster -> "Toaster"
   | Happy -> "Happy"
   | Sad -> "Sad"
+  | If -> "If"
+  | Else -> "Else"
+    | Let -> "Let"
   | Colon -> "Colon"
   | OpenBrace -> "OpenBrace"
   | CloseBrace -> "CloseBrace"
@@ -76,6 +83,7 @@ let string_of_token = function
   | NotEquals -> "NotEquals"
   | Dot -> "Dot"
   | Return -> "Return"
+  | Give -> "Give"
   | LogNot -> "LogNot"
   | BinNot -> "BinNot"
   | Exponent -> "Exponent"
