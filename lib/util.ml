@@ -43,6 +43,8 @@ module List = struct
   let inspect f lst =
     List.iter f lst;
     lst
+
+  let zip l1 l2 = List.map2 (fun a b -> a, b) l1 l2
 end
 
 let sl_grouped n map sep sep_line lst =

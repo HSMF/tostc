@@ -25,10 +25,19 @@ let parse_tokens (toks : Tokens.token Seq.t) =
     exit ~-1
   end
 
+let write_file filename s =
+  let f = open_out filename in
+  output_string f s;
+  close_out f
+
+
 
 let process_file filename =
   let f = open_in filename in
   printf "processing %s\n" filename;
   let parsed = f |> lex_channel |> parse_tokens in
   close_in f;
-  printf "received:\n%s\n" (Astlib.string_of_program parsed)
+  printf "received:\n%s\n" (Astlib.string_of_program parsed);
+  let llvm = Compile.compile_prog parsed in
+  output_string stdout @@ Llvmlib.string_of_prog llvm;
+  ()
