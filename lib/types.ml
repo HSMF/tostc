@@ -2,6 +2,7 @@ open Util
 
 type typ =
   | Int
+    | Uint
   | String
   | Char
   | Var of string
@@ -10,6 +11,7 @@ type typ =
 
 let rec string_of_typ = function
   | Int -> "int"
+  | Uint -> "uint"
   | String -> "string"
   | Char -> "char"
   | Var s -> s
@@ -24,5 +26,6 @@ let rec typ_of_ast_typ : Ast.ty -> typ = function
   | Ast.TVar "int" -> Int
   | Ast.TVar "string" -> String
   | Ast.TVar "char" -> Char
+  | Ast.TVar "uint" -> Uint
   | Ast.TVar s -> Var s
   | Ast.TTuple ts -> Tuple (List.map typ_of_ast_typ ts)
