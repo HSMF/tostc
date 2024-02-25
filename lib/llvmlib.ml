@@ -2,6 +2,7 @@ open Llvm
 open Util
 
 let rec indent depth s = if depth <= 0 then s else "  " ^ indent (depth - 1) s
+let line_end s = s ^ "\n"
 let uid (u : uid) = "%" ^ u
 let gid (u : gid) = "@" ^ u
 let tid (u : tid) = u
@@ -30,7 +31,7 @@ let bop = function
   | Add -> "add"
   | Sub -> "sub"
   | Mul -> "mul"
-  | Udiv -> "udiv"
+  | UDiv -> "udiv"
   | SDiv -> "sdiv"
   | URem -> "urem"
   | SRem -> "srem"
@@ -106,19 +107,19 @@ let term : term -> string = function
 
 
 let block { insns; term = _, term' } =
-  sp "%s\n%s" (sl (insn >>> indent 2) "\n" insns) (term term')
+  sl (insn >>> indent 2 >>> line_end) "" insns ^ (term term' |> indent 2 |> line_end)
 
 
 let cfg { entry; labeled } =
   sp
-    "  %s\n%s"
+    "%s%s"
     (block entry)
     (sl (fun (label, b) -> sp "  %s:\n%s" label (block b)) "\n" labeled)
 
 
 let fdecl (name, { typ = args, ret; param; body }) =
   sp
-    "define %s %s(%s) {\n%s\n}"
+    "define %s %s(%s) {\n%s}"
     (typ ret)
     (gid name)
     (sl (fun (ty, par) -> sp "%s %s" (typ ty) (uid par)) ", " (List.zip args param))

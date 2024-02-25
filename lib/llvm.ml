@@ -36,7 +36,7 @@ type bop =
   | Add
   | Sub
   | Mul
-  | Udiv
+  | UDiv
   | SDiv
   | URem
   | SRem

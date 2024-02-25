@@ -29,7 +29,6 @@ and block = stmt node list
 and stmt =
   | SReturn of expr node
   | SGive of expr node
-  | SDecl of pattern node * expr node
   | SIf of expr node * block * block option
   | SLet of pattern * expr node
 
@@ -44,8 +43,11 @@ and expr =
   | EIf of expr node * block * block option
   | EString of string
   | EFormatString of segment list
+  | ECall of expr node * happiness * expr node list
 
-and segment = Fragment of string | SegExpr of expr node
+and segment =
+  | Fragment of string
+  | SegExpr of expr node
 
 and bop =
   | BopAdd

@@ -8,7 +8,7 @@ let indented level s = indent level ^ s
 let rec string_of_program (p : item list) =
   sl
     (function
-      | Func f -> string_of_func f.elt)
+     | Func f -> string_of_func f.elt)
     "\n\n"
     p
 
@@ -47,8 +47,6 @@ and string_of_stmt ?(indentation = 0) (s : stmt) =
     | SReturn exp -> sp "return %s;" (string_of_expr ~indentation exp.elt)
     | SGive { elt = ETuple []; _ } -> "give;"
     | SGive exp -> sp "give %s;" (string_of_expr ~indentation exp.elt)
-    | SDecl (pat, exp) ->
-      sp "let %s = %s;" (string_of_pattern pat.elt) (string_of_expr exp.elt)
     | SIf (cond, yes, no) -> string_of_expr ~indentation (EIf (cond, yes, no))
     | SLet (pat, e) ->
       sp
@@ -73,6 +71,7 @@ and string_of_expr ?(indentation = 0) (e : expr) =
   | EBop (op, l, r) -> sp "(%s %s %s)" (se l) (string_of_bop op) (se r)
   | EInt i -> Int64.to_string i
   | EUop (op, e) -> sp "(%s %s)" (string_of_uop op) (se e)
+  | ECall (fn, _happiness, args) -> sp "(%s)(%s)" (se fn) (sl se ", " args)
   | EIf (cond, thn, None) -> sp "if %s %s" (se cond) (string_of_block ~indentation thn)
   | EIf (cond, thn, Some els) ->
     sp
@@ -86,8 +85,8 @@ and string_of_expr ?(indentation = 0) (e : expr) =
       "f\"%s\""
       (sl
          (function
-           | Fragment x -> x
-           | SegExpr ex -> sp "{%s}" @@ se ex)
+          | Fragment x -> x
+          | SegExpr ex -> sp "{%s}" @@ se ex)
          ""
          parts)
 

@@ -25,19 +25,31 @@ let parse_tokens (toks : Tokens.token Seq.t) =
     exit ~-1
   end
 
-let write_file filename s =
-  let f = open_out filename in
+
+type 'a file =
+  { open_file : unit -> 'a
+  ; close_file : 'a -> unit
+  }
+
+let write_string strategy s =
+  let f = strategy.open_file () in
   output_string f s;
-  close_out f
+  strategy.close_file f
 
 
-
-let process_file filename =
-  let f = open_in filename in
+let process_file
+  ~(read_input : in_channel file)
+  ~(write_parsed : out_channel file)
+  ~(write_llvm : out_channel file)
+  filename
+  =
+  let f = read_input.open_file () in
   printf "processing %s\n" filename;
   let parsed = f |> lex_channel |> parse_tokens in
-  close_in f;
-  printf "received:\n%s\n" (Astlib.string_of_program parsed);
-  let llvm = Compile.compile_prog parsed in
-  output_string stdout @@ Llvmlib.string_of_prog llvm;
+  read_input.close_file f;
+  write_string write_parsed @@ sp "received:\n%s\n" (Astlib.string_of_program parsed);
+  let normalized = List.map Type_normalize.normalize_item parsed in
+  write_string write_parsed @@ sp "normalized:\n%s\n" (Astlib.string_of_program normalized);
+  let llvm = Compile.compile_prog normalized in
+  write_string write_llvm @@ Llvmlib.string_of_prog llvm;
   ()
