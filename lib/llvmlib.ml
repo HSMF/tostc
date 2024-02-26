@@ -80,10 +80,16 @@ let insn (i, ins) =
         (typ ty)
         (operand a)
         (sl (operand >>> sp "i64 %s") ", " indices)
-    | Bitcast (_, _, _) -> ""
+    | Bitcast (t1, op, t2) -> sp "bitcast %s %s to %s" (typ t1) (operand op) (typ t2)
+    | Comment s -> sp "; %s" s
+    | Phi (ty, vs) ->
+      sp
+        "phi %s %s"
+        (typ ty)
+        (sl (fun (op, lab) -> sp "[ %s, %%%s ]" (operand op) (lbl lab)) ", " vs)
   in
   match ins with
-  | Store _ | Call (LVoid, _, _) -> s_ins
+  | Store _ | Call (LVoid, _, _) | Comment _ -> s_ins
   | _ -> sp "%s = %s" (uid i) s_ins
 
 
@@ -91,8 +97,8 @@ let term : term -> string = function
   | RetVoid -> "ret void"
   | Ret (t, op) -> sp "ret %s %s" (typ t) (operand op)
   | Br (cnd, yes, no) ->
-    sp "br i1 %s, label %s, label %s" (operand cnd) (lbl yes) (lbl no)
-  | BrUncond l -> sp "br label %s" (lbl l)
+    sp "br i1 %s, label %s, label %s" (operand cnd) (uid yes) (uid no)
+  | BrUncond l -> sp "br label %s" (uid l)
   | Switch (intty, value, defaultdest, cases) ->
     sp
       "switch %s %s, label %s, [%s]"

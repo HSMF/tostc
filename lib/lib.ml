@@ -41,6 +41,7 @@ let process_file
   ~(read_input : in_channel file)
   ~(write_parsed : out_channel file)
   ~(write_llvm : out_channel file)
+  ~(compile_file : unit -> unit)
   filename
   =
   let f = read_input.open_file () in
@@ -49,7 +50,9 @@ let process_file
   read_input.close_file f;
   write_string write_parsed @@ sp "received:\n%s\n" (Astlib.string_of_program parsed);
   let normalized = List.map Type_normalize.normalize_item parsed in
-  write_string write_parsed @@ sp "normalized:\n%s\n" (Astlib.string_of_program normalized);
+  write_string write_parsed
+  @@ sp "normalized:\n%s\n" (Astlib.string_of_program normalized);
   let llvm = Compile.compile_prog normalized in
   write_string write_llvm @@ Llvmlib.string_of_prog llvm;
+  compile_file ();
   ()

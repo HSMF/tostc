@@ -70,6 +70,8 @@ type insn =
   | Call of typ * operand * (typ * operand) list
   | Gep of typ * operand * operand list
   | Bitcast of typ * operand * typ
+  | Comment of string
+  | Phi of typ * (operand * lbl) list
 
 (** terminator instruction *)
 type term =

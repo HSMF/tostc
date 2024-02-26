@@ -24,6 +24,7 @@ and ty =
   | TVar of type_id
   | TTuple of ty list
 
+(** a block of code *)
 and block = stmt node list
 
 and stmt =
