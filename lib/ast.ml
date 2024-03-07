@@ -14,9 +14,14 @@ type id = string
 type type_id = string
 
 (** a function, fields are: function name, arguments, return type, body *)
-type item = Func of func node
+type item =
+  | Func of func node
+  | Recipe of id * recipe_item list
+  | Bake of id * id * bake_item list
+  (* both target and recipe should probably be paths *)
 
 and func = id * happiness * arg list * ty * block
+and typedef = id * ty
 and happiness = bool
 and arg = id * ty
 
@@ -37,6 +42,7 @@ and pattern = PId of id
 
 and expr =
   | EVar of id
+  | EAccess of expr node * id
   | ETuple of expr node list
   | EBop of bop * expr node * expr node
   | EUop of uop * expr node
@@ -76,3 +82,12 @@ and uop =
   | UopNegative
   | UopNeg
   | UopFlip
+
+and recipe_item =
+  | ToastDef of id
+  | ToasterStub of (id * happiness * arg list * ty) node
+  | Toaster of func node
+
+and bake_item =
+  | BToaster of func node
+  | BToast of typedef node

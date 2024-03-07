@@ -49,7 +49,7 @@ let process_file
   let parsed = f |> lex_channel |> parse_tokens in
   read_input.close_file f;
   write_string write_parsed @@ sp "received:\n%s\n" (Astlib.string_of_program parsed);
-  let normalized = List.map Type_normalize.normalize_item parsed in
+  let normalized = Type_normalize.normalize parsed in
   write_string write_parsed
   @@ sp "normalized:\n%s\n" (Astlib.string_of_program normalized);
   let llvm = Compile.compile_prog normalized in

@@ -24,6 +24,11 @@ let reserved =
   ; "let", Let
   ; "if", If
   ; "else", Else
+  ; "recipe", Recipe
+  ; "toast", Toast
+  ; "bake", Bake
+  ; "with", With
+  ; "me", Me
   ; (* unary operators *)
     "+", Plus
   ; "-", Minus
@@ -50,6 +55,7 @@ let reserved =
   ; (* *)
     "=", Assign
   ; ",", Comma
+  ; ".", Dot
   ; ":>", Happy
   ; ":<", Sad
   ; ":", Colon
@@ -137,7 +143,7 @@ let lex buf : token Seq.t =
     | "&&"
     | "||"
     | "^^"
-    | Chars "()={,;:"
+    | Chars "()={,;:."
     | Chars "+-*/&|^<>~!" -> produce @@ create_token buf
     | number -> produce @@ create_int buf
     | ident_char, Star (ident_char | digit) -> produce @@ create_token buf

@@ -8,6 +8,11 @@ type token =
   | OpenBrace
   | CloseBrace
   | Toaster
+  | Toast
+  | Recipe
+  | Bake
+  | With
+  | Me
   | Happy
   | Sad
   | If
@@ -63,11 +68,16 @@ let string_of_token = function
   | BeginString -> "BeginString"
   | EndString -> "EndString"
   | Toaster -> "Toaster"
+  | Toast -> "Toast"
+  | Recipe -> "Recipe"
+  | Bake -> "Bake"
+  | With -> "With"
+  | Me -> "Me"
   | Happy -> "Happy"
   | Sad -> "Sad"
   | If -> "If"
   | Else -> "Else"
-    | Let -> "Let"
+  | Let -> "Let"
   | Colon -> "Colon"
   | OpenBrace -> "OpenBrace"
   | CloseBrace -> "CloseBrace"

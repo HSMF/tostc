@@ -15,12 +15,44 @@ token_StringFragment = string
 token_Int = {int64}
 
 program: { item list }
-  | FUNC program { Func v0 :: v1 }
+  | ITEM program { v0 :: v1 }
   | { [] }
+
+ITEM: { item }
+  | FUNC { Func v0 }
+  | RECIPE { match v0 with a, b -> Recipe (a, b) }
+  | BAKE { match v0 with a, b, c -> Bake (a, b, c) }
 
 FUNC: { func node }
   | Toaster Ident HAPPINESS ARG_LIST RETURN_TYPE BLOCK
       { no_loc (v1, v2, v3, v4, v5) }
+
+RECIPE: { id * recipe_item list }
+  | Recipe Ident OpenBrace RECIPE_BODY CloseBrace { v1, v3 }
+
+RECIPE_ITEM: { recipe_item }
+  | Toast Ident Semicolon { ToastDef v1 }
+  | Toaster Ident HAPPINESS ARG_LIST RETURN_TYPE Semicolon
+      { ToasterStub (no_loc (v1, v2, v3, v4)) }
+  | FUNC { Toaster v0 }
+
+RECIPE_BODY: { recipe_item list }
+  | { [] }
+  | RECIPE_ITEM RECIPE_BODY { v0 :: v1 }
+
+BAKE: { id * id * bake_item list }
+  | Bake Ident With Ident OpenBrace BAKE_BODY CloseBrace { v1, v3, v5 }
+
+BAKE_ITEM: { bake_item }
+  | TYPEDEF { BToast v0 }
+  | FUNC { BToaster v0 }
+
+BAKE_BODY: { bake_item list }
+  | { [] }
+  | BAKE_ITEM BAKE_BODY { v0 :: v1 }
+
+TYPEDEF: { typedef node }
+  | Toast Ident Equals TYPE Semicolon { no_loc @@ (v1, v3) }
 
 HAPPINESS: { bool }
   | Happy { true }
@@ -28,6 +60,7 @@ HAPPINESS: { bool }
 
 ARG: { arg }
   | Ident Colon TYPE { v0, v2 }
+  | Me { "me", TVar "Me" }
 
 ARG_LIST: {arg list}
   | ARG_LIST_ { List.rev v0 }
@@ -129,9 +162,24 @@ EXPR_ATOM: { expr node }
   | OpenParen CloseParen { no_loc @@ ETuple [] }
   | Int { no_loc @@ EInt v0 }
   | Ident { no_loc @@ EVar v0 }
+  | Me { no_loc @@ EVar "me" }
+  | EXPR_ATOM Dot Ident { no_loc @@ EAccess (v0, v2) }
   | IF_CONSTRUCT { match v0 with (cond, yes, no) -> no_loc @@ EIf (cond, yes, no) }
   | String { no_loc @@ EString v0 }
   | BeginString FORMAT EndString { no_loc @@ EFormatString v1 }
+  | EXPR_ATOM OpenParen E_LIST CloseParen { no_loc @@ ECall (v0, true, v2) }
+
+E_LIST: { expr node list }
+  | E_LIST_ { List.rev v0 }
+  | E_LIST_ Comma { List.rev v0 }
+  | Comma { [] }
+  | { [] }
+
+E_LIST_: { expr node list }
+  | E_LIST_ Comma EXPR { v2 :: v0 }
+  | EXPR { [v0] }
+
+
 
 FORMAT: { segment list }
   | StringFragment { [Fragment v0] }

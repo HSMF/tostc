@@ -8,9 +8,44 @@ let indented level s = indent level ^ s
 let rec string_of_program (p : item list) =
   sl
     (function
-     | Func f -> string_of_func f.elt)
+     | Func f -> string_of_func f.elt
+     | Recipe (name, items) ->
+       sp "recipe %s {\n%s\n}" name (sl (string_of_recipe_item ~indentation:1) "\n" items)
+     | Bake (target, recipe, body) ->
+       sp
+         "bake %s with %s {\n%s\n}"
+         target
+         recipe
+         (sl (string_of_bake_item ~indentation:1) "\n" body))
     "\n\n"
     p
+
+
+and string_of_recipe_item ?(indentation = 0) item =
+  (match item with
+   | ToastDef toast -> sp "toast %s;" toast
+   | ToasterStub { elt = name, happy, args, retty; _ } ->
+     sp
+        "toaster %s %s %s %s;"
+       name
+       (if happy then ":>" else ":<")
+       (sl string_of_arg ", " args)
+       (match retty with
+        | TTuple [] -> ""
+        | _ -> sp " -> %s" (string_of_ty retty))
+   | Toaster f -> string_of_func f.elt)
+  |> indented indentation
+
+
+and string_of_bake_item ?(indentation = 0) (item : bake_item) =
+  (match item with
+   | BToast toast -> string_of_typedef ~indentation toast.elt
+   | BToaster f -> string_of_func ~indentation f.elt)
+  |> indented indentation
+
+
+and string_of_typedef ?(indentation = 0) ((name, t) : typedef) =
+  sp "%stoast %s = %s;" (indent indentation) name (string_of_ty t)
 
 
 and string_of_func ?(indentation = 0) ((name, happy, args, retty, body) : func) =
@@ -67,6 +102,7 @@ and string_of_expr ?(indentation = 0) (e : expr) =
   let se = elt >>> string_of_expr ~indentation in
   match e with
   | EVar v -> v
+  | EAccess (e, field) -> sp "(%s).%s" (se e) field
   | ETuple els -> sp "(%s)" @@ sl se ", " els
   | EBop (op, l, r) -> sp "(%s %s %s)" (se l) (string_of_bop op) (se r)
   | EInt i -> Int64.to_string i

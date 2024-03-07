@@ -2,7 +2,7 @@
  (name main)
  (public_name tostc)
  (libraries Lib)
- (modes byte))
+ (modes native))
 
 (env
  (dev
